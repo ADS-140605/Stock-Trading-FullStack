@@ -25,7 +25,7 @@ A full-stack simulation platform where users trade with virtual money against a 
 | Real-time transport | WebSockets |
 | Auth | JWT (OAuth2 password flow) |
 
-> See [`stock-trading-platform-architecture.md`](./stock-trading-platform-architecture.md) for full schema, API, and simulation engine design.
+> See [`Architechture`](./Plan.md) for full schema, API, and simulation engine design.
 
 ---
 
