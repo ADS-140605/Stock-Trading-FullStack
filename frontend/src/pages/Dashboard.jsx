@@ -80,6 +80,33 @@ export default function Dashboard() {
     return sortableStocks;
   };
 
+  // Live Portfolio Graph Updater
+  useEffect(() => {
+    if (!portfolio || equityCurve.length === 0) return;
+    
+    // Calculate live total value
+    const liveTotal = portfolio.holdings.reduce((sum, h) => {
+      const livePrice = prices[h.symbol]?.price || (h.current_value / h.quantity);
+      return sum + (h.quantity * livePrice);
+    }, portfolio.cash_balance);
+
+    setEquityCurve(prevCurve => {
+      const updatedCurve = [...prevCurve];
+      const lastPoint = updatedCurve[updatedCurve.length - 1];
+      const now = new Date();
+      
+      const lastTime = new Date(lastPoint.x).getTime();
+      // Add a new point every 10 seconds to create a live-moving line graph
+      if (now.getTime() - lastTime >= 10000) {
+        updatedCurve.push({ x: now.toISOString(), y: liveTotal });
+      } else {
+        lastPoint.y = liveTotal;
+        lastPoint.x = now.toISOString();
+      }
+      return updatedCurve;
+    });
+  }, [prices]); // Run when prices stream updates
+
   if (loading) return <div className="page-placeholder">Loading market data...</div>;
 
   const sortedStocks = getSortedStocks();
@@ -110,33 +137,6 @@ export default function Dashboard() {
     dataLabels: { enabled: false },
     legend: { position: 'bottom' }
   };
-
-  // Live Portfolio Graph Updater
-  useEffect(() => {
-    if (!portfolio || equityCurve.length === 0) return;
-    
-    // Calculate live total value
-    const liveTotal = portfolio.holdings.reduce((sum, h) => {
-      const livePrice = prices[h.symbol]?.price || (h.current_value / h.quantity);
-      return sum + (h.quantity * livePrice);
-    }, portfolio.cash_balance);
-
-    setEquityCurve(prevCurve => {
-      const updatedCurve = [...prevCurve];
-      const lastPoint = updatedCurve[updatedCurve.length - 1];
-      const now = new Date();
-      
-      const lastTime = new Date(lastPoint.x).getTime();
-      // Add a new point every 10 seconds to create a live-moving line graph
-      if (now.getTime() - lastTime >= 10000) {
-        updatedCurve.push({ x: now.toISOString(), y: liveTotal });
-      } else {
-        lastPoint.y = liveTotal;
-        lastPoint.x = now.toISOString();
-      }
-      return updatedCurve;
-    });
-  }, [prices]); // Run when prices stream updates
 
   const currentTotal = equityCurve.length > 0 ? equityCurve[equityCurve.length - 1].y : 0;
 
