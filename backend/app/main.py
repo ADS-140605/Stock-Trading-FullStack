@@ -91,7 +91,7 @@ async def websocket_endpoint(websocket: WebSocket, token: str = None):
         while True:
             _ = await websocket.receive_text() # keep-alive
     except WebSocketDisconnect:
-        manager.disconnect(username)
+        manager.disconnect(websocket, username)
 
 if __name__ == "__main__":
     uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
