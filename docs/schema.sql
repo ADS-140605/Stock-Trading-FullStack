@@ -1,5 +1,4 @@
 -- Virtual Stock Trading Platform
--- PostgreSQL schema derived from Plan.md
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
